@@ -1,21 +1,31 @@
 const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
-    host:"smtp.ethereal.email",
+    host:"smtp.gmail.com",
+    service:"google",
     port:587,
     secure:false,
     auth:{
-        user:'brandi.rempel39@ethereal.email',
-        pass:'3T4QmG1gufrNuuWpvn'
+        user:'slatetexteditor@gmail.com',
+        pass:'tgfs cczv czso mygd'
     }
 });
-const sendmail= async(email,subject,text)=>{
-    await transporter.sendMail({
-        from:'"Slate" <brandi.rempel39@ethereal.email>',
+const sendmail= async(email,text)=>{
+    const mailOptions = {
+        from:'"Slate" <slatetexteditor@gmail.com>',
         to:email,
-        subject:subject,
+        subject:"Verify Email",
         text:text,
-    })
+    }
+
+    await transporter.sendMail(mailOptions,(err,info)=>{
+        if(err){
+           
+            
+        }
+        
+        
+    });
 }
 
-module.exports=sendmail;
+module.exports=sendmail
