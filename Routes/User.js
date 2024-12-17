@@ -7,8 +7,8 @@ const sendMail = require("../utils/emailAuth");
 const crypto = require("crypto");
 const tokenModel = require("../Models/token");
 const jwt = require("jsonwebtoken");
-const cookie = require("cookie-parser");
 const authorization = require("../middleware/aut");
+require("cookie-parser");
 
 //user signup
 route.post("/register", async (req, res) => {
@@ -117,5 +117,17 @@ route.get("/:id/:token", async (req, res) => {
 route.get("/dashboard", authorization, async (req, res) => {
   const user = req.user;
   res.status(200).json({ user });
+});
+
+route.post("/logout", async (req, res) => {
+  res
+    .clearCookie("token", {
+      httpOnly: true,
+      sameSite: "Strict",
+      secure: false,
+      path: "/",
+    })
+    .status(200)
+    .end();
 });
 module.exports = route;

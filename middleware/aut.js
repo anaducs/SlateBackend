@@ -1,6 +1,5 @@
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
-const cookies= require('cookie-parser');
 
 const authorization =(req,res,next)=>{
 const token = req.cookies.token;
@@ -16,7 +15,7 @@ jwt.verify(token,process.env.JWT_SECRET_KEY,(err,user)=>{
     req.user=user;
     next();
 });
-console.log(token);
+
 
 }
 
