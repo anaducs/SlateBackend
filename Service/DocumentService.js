@@ -20,70 +20,76 @@ const initializeSocket = (server) => {
 
   io.on("connection", (socket) => {
     try {
-      if(!socket){
-        console.log('no connection ');
-        
+      if (!socket) {
+        console.log("no connection ");
       }
-           
+
       const cookies = socket.request.headers.cookie;
       const parsedl = cookieParser.parse(cookies);
-      const token = parsedl.token
+      const token = parsedl.token;
       if (!cookies) {
         socket.emit("error", "no token");
-        console.log('no token error');        
+        console.log("no token error");
         return;
       }
-      jwt.verify(
-        token,
-        process.env.JWT_SECRET_KEY,
-        (err,user) => {
-          if (err) {
-            socket.emit("error", "invalid token");
-            console.log('JWT',err);            
-            return;
-          }
+      jwt.verify(token, process.env.JWT_SECRET_KEY, (err, user) => {
+        if (err) {
+          socket.emit("error", "invalid token");
+          console.log("JWT", err);
+          return;
+        }
 
-          console.log("userconnected");
-      // Room creation
-      socket.on("get-document", async (userId, documentId) => {
-        try {
-          if (!userId || !documentId) {
-            socket.emit("error", "Invalid userId or documentId");
-            return;
-          }
+        console.log("userconnected");
+        // Room creation
+        socket.on("get-document", async (userId, documentId) => {
+          try {
+            console.log("user", userId);
+            console.log("doc", documentId);
 
-          const document = await findOrCreateDoc(userId, documentId);
-
-          socket.join(documentId);
-          socket.emit("load-document", document.data);
-
-          socket.on("send-changes", (delta) => {
-            socket.broadcast.to(documentId).emit("received-message", delta);
-          });
-
-          socket.on("save-document", async (data) => {
-            try {
-              await documentModel.findByIdAndUpdate(documentId, { data });
-              console.log("Document saved successfully:", documentId);
-            } catch (err) {
-              console.error("Error saving document:", err);
+            if (!userId || !documentId) {
+              socket.emit("error", "Invalid userId or documentId");
+              return;
             }
-          });
-        } catch (err) {
-          console.error("Error in 'get-document':", err);
-          socket.emit("error", "An error occurred while fetching the document");
-        }
-      });
-          
-        }
-      );
-      
-    } catch (err) {}
+            //check permision 
+            if (user.id != userId) {
+              socket.emit("error", "you dont have permision");
+              return;
+            }
 
-    // Handle disconnection
-    socket.on("disconnect", () => {
-      console.log("User disconnected:", socket.id);
-    });
+            const document = await findOrCreateDoc(userId, documentId);
+
+            socket.join(documentId);
+            socket.emit("load-document", document.data);
+
+            socket.on("send-changes", (delta) => {
+              socket.broadcast.to(documentId).emit("received-message", delta);
+            });
+
+            socket.on("save-document", async (data) => {
+              try {
+                await documentModel.findByIdAndUpdate(documentId, { data });
+                console.log("Document saved successfully:", documentId);
+              } catch (err) {
+                console.error("Error saving document:", err);
+              }
+            });
+          } catch (err) {
+            console.error("Error in 'get-document':", err);
+            socket.emit(
+              "error",
+              "An error occurred while fetching the document"
+            );
+          }
+        });
+
+        // Handle disconnection
+        socket.on("disconnect", () => {
+          console.log("User disconnected:", socket.id);
+        });
+      });
+    } catch (err) {
+      console.log(err);
+    }
   });
 
   const findOrCreateDoc = async (uid, id) => {
