@@ -8,12 +8,11 @@ const documentSchema = new mongoose.Schema(
       type: String,
       default: "Untitled",
     },
-
-    // userId:{
-    //     type:mongoose.Schema.Types.ObjectId,
-    //     require:true,
-    //     ref:'user'
-    // },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      require: true,
+      ref: "user",
+    },
   },
   { timestamps: true }
 );
