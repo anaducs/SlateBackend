@@ -1,5 +1,9 @@
+require("dotenv").config();
 const socketIo = require("socket.io");
 const documentModel = require("../Models/Document");
+const userModel = require("../Models/userModel");
+const cookieParser = require("cookie");
+const jwt = require("jsonwebtoken");
 
 let io;
 const defaultValue = "";
@@ -8,36 +12,98 @@ const initializeSocket = (server) => {
   io = socketIo(server, {
     cors: {
       origin: "http://localhost:5173",
+      methods: ["GET", "POST"],
+      allowedHeaders: ["Authorization"],
+      credentials: true,
     },
   });
 
   io.on("connection", (socket) => {
-    console.log("A user connected");
+    try {
+      const cookies = socket.request.headers.cookie;
+      const parsedl = cookieParser.parse(cookies);
+      const token = parsedl.token;
+      if (!cookies) {
+        socket.emit("error", "no token");
 
-    //creating room
-    socket.on("get-document", async (documentId) => {
-      const document = await findOrCreateDoc(documentId);
-      socket.join(documentId);
-      socket.emit("load-document", document.data);
-      socket.on("send-changes", (delta) => {
-        socket.broadcast.to(documentId).emit("received-message", delta);
-      });
-      socket.on("save-document", async (data) => {
-        await documentModel.findByIdAndUpdate(documentId, { data });
-      });
-    });
+        return;
+      }
+      jwt.verify(token, process.env.JWT_SECRET_KEY, (err, user) => {
+        if (err) {
+          socket.emit("error", "invalid token");
 
-    socket.on("disconnect", () => {
-      console.log("User disconnected");
-    });
+          return;
+        }
+
+        // Room creation
+        socket.on("get-document", async (userId, documentId) => {
+          try {
+            if (!userId || !documentId) {
+              socket.emit("error", "Invalid userId or documentId");
+              return;
+            }
+            //check permision
+            if (user.id != userId) {
+              socket.emit("error", "you dont have permision");
+              return;
+            }
+
+            const document = await findOrCreateDoc(userId, documentId);
+
+            socket.join(documentId);
+            socket.emit("load-document", document.data);
+
+            socket.on("send-changes", (delta) => {
+              socket.broadcast.to(documentId).emit("received-message", delta);
+            });
+
+            socket.on("save-document", async (data) => {
+              try {
+                await documentModel.findByIdAndUpdate(documentId, { data });
+              } catch (err) {
+                console.error("Error saving document:", err);
+              }
+            });
+          } catch (err) {
+            console.error("Error in 'get-document':", err);
+            socket.emit(
+              "error",
+              "An error occurred while fetching the document"
+            );
+          }
+        });
+
+        // Handle disconnection
+        socket.on("disconnect", () => {});
+      });
+    } catch (err) {}
   });
 
-  const findOrCreateDoc = async (id) => {
-    if (id == null) return;
-    const document = await documentModel.findById(id);
-    if (document) return document;
+  const findOrCreateDoc = async (uid, id) => {
+    try {
+      const user = await userModel.findById(uid);
+      if (!user) {
+        throw new Error("User not found");
+      }
 
-    return await documentModel.create({ _id: id, data: defaultValue });
+      let document = await documentModel.findById(id);
+      if (document) {
+        if (String(document.userId) !== String(uid)) {
+          throw new Error("Unauthorized access to the document");
+        }
+        return document;
+      }
+
+      document = await documentModel.create({
+        _id: id,
+        data: defaultValue,
+        userId: uid,
+      });
+      return document;
+    } catch (err) {
+      console.error("Error in 'findOrCreateDoc':", err);
+      throw err;
+    }
   };
 
   return io;

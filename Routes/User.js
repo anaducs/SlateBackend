@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const route = express.Router();
 const userModel = require("../Models/userModel");
+const documentModel = require("../Models/Document")
 const bcrypt = require("bcryptjs");
 const sendMail = require("../utils/emailAuth");
 const crypto = require("crypto");
@@ -76,7 +77,7 @@ route.post("/login", async (req, res) => {
       algorithm: "HS256",
       expiresIn: "7d",
     });
-
+    const UserId = user.id;   
     //sending cookie
     res
       .status(200)
@@ -86,7 +87,10 @@ route.post("/login", async (req, res) => {
         secure: false,
         path: "/",
       })
-      .end();
+      .json({user :UserId});
+
+      console.log('success');
+      
   } catch (err) {
     res.status(500).json({ msg: "server down" });
   }
@@ -116,8 +120,22 @@ route.get("/:id/:token", async (req, res) => {
 //dashboard
 route.get("/dashboard", authorization, async (req, res) => {
   const user = req.user;
-  res.status(200).json({ user });
+  res.status(200).json({user});
 });
+
+//Load user data
+
+route.get('/getDocument',authorization,async(req,res)=>{
+ try{const user = req.user.id;
+ const userDocument = await documentModel.find({userId:user});
+ res.status(200).json(userDocument);
+ }catch(Err){
+  console.log(Err);
+  
+ }
+ 
+  
+})
 
 route.post("/logout", async (req, res) => {
   res
