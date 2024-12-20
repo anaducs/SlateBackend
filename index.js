@@ -10,6 +10,7 @@ const port = process.env.PORT || 5000;
 const uri = process.env.MONGO_URL;
 
 const userRoute = require("./Routes/User"); 
+const documentRoute = require("./Routes/Document");
 const initializeSocket = require("./Service/DocumentService"); 
 // Middleware
 app.use(
@@ -23,6 +24,7 @@ app.use(cookie());
 
 // Routes
 app.use("/api/users", userRoute);
+app.use("/api/document",documentRoute);
 
 // Database connection
 mongoose

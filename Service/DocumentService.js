@@ -5,6 +5,7 @@ const userModel = require("../Models/userModel");
 const cookieParser = require("cookie");
 const jwt = require("jsonwebtoken");
 
+
 let io;
 const defaultValue = "";
 
@@ -20,6 +21,8 @@ const initializeSocket = (server) => {
 
   io.on("connection", (socket) => {
     try {
+
+            
       const cookies = socket.request.headers.cookie;
       const parsedl = cookieParser.parse(cookies);
       const token = parsedl.token;
