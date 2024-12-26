@@ -64,7 +64,21 @@ route.post("/login", async (req, res) => {
       return res.status(401).json({ msg: "invalid cridentials" });
     }
     if (!user.verified) {
+      //generating token for email verification
+
+    const verifyToken = crypto.randomBytes(32).toString("hex");
+
+    const token = await new tokenModel({
+      userId: user.id,
+      token: verifyToken,
+    });
+    await token.save();
+
+    const verifyUrl = `http://localhost:3001/api/users/${user.id}/${token.token}`;
+    //sending email
+    sendMail(email, verifyUrl);
       return res.status(403).json({ msg: "please verify your email" });
+
     }
 
     // adding values to payload for jwt signing

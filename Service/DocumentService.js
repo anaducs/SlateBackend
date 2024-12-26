@@ -22,15 +22,16 @@ const initializeSocket = (server) => {
   io.on("connection", (socket) => {
     try {
 
-            
+    
+      
       const cookies = socket.request.headers.cookie;
-      const parsedl = cookieParser.parse(cookies);
-      const token = parsedl.token;
-      if (!cookies) {
+       if (!cookies) {
         socket.emit("error", "no token");
-
         return;
       }
+      const parsedl = cookieParser.parse(cookies);
+      const token = parsedl.token;
+     
       jwt.verify(token, process.env.JWT_SECRET_KEY, (err, user) => {
         if (err) {
           socket.emit("error", "invalid token");
@@ -46,7 +47,7 @@ const initializeSocket = (server) => {
               return;
             }
             //check permision
-            if (user.id != userId) {
+            if (String(user.id) != String(userId)) {
               socket.emit("error", "you dont have permision");
               return;
             }
@@ -64,7 +65,7 @@ const initializeSocket = (server) => {
               try {
                 await documentModel.findByIdAndUpdate(documentId, { data });
               } catch (err) {
-                console.error("Error saving document:", err);
+                console.log("Error saving document:", err);
               }
             });
           } catch (err) {
@@ -77,9 +78,10 @@ const initializeSocket = (server) => {
         });
 
         // Handle disconnection
-        socket.on("disconnect", () => {});
+       
       });
-    } catch (err) {}
+    } catch (err) { }
+     socket.on("disconnect", () => {});
   });
 
   const findOrCreateDoc = async (uid, id) => {
@@ -93,6 +95,8 @@ const initializeSocket = (server) => {
       if (document) {
         if (String(document.userId) !== String(uid)) {
           throw new Error("Unauthorized access to the document");
+          return;
+          
         }
         return document;
       }
