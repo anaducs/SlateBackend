@@ -98,7 +98,7 @@ route.post("/login", async (req, res) => {
       .cookie("token", signedToken, {
         httpOnly: true,
         sameSite: "strict",
-        secure: false,
+        secure: true,
         path: "/",
       })
       .json({user :UserId});
