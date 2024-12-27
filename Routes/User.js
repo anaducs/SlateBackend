@@ -38,7 +38,7 @@ route.post("/register", async (req, res) => {
     });
     await token.save();
 
-    const verifyUrl = `http://localhost:3001/api/users/${user.id}/${token.token}`;
+    const verifyUrl = `https://slatebackend-446007.as.r.appspot.com/api/users/${user.id}/${token.token}`;
     //sending email
     sendMail(email, verifyUrl);
 
@@ -74,7 +74,7 @@ route.post("/login", async (req, res) => {
     });
     await token.save();
 
-    const verifyUrl = `http://localhost:3001/api/users/${user.id}/${token.token}`;
+    const verifyUrl = `https://slatebackend-446007.as.r.appspot.com/api/users/${user.id}/${token.token}`;
     //sending email
     sendMail(email, verifyUrl);
       return res.status(403).json({ msg: "please verify your email" });

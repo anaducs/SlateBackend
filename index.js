@@ -15,7 +15,7 @@ const initializeSocket = require("./Service/DocumentService");
 // Middleware
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "https://slate-u2yd.onrender.com",
     credentials: true,
   })
 );
