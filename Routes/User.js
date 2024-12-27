@@ -51,9 +51,9 @@ route.post("/register", async (req, res) => {
 });
 // user loginn
 route.post("/login", async (req, res) => {
-  console.log("hi");
-  
   const { email, password } = req.body;
+  console.log(req.body);
+  
   try {
     const user = await userModel.findOne({ email });
 
