@@ -9,7 +9,6 @@ const crypto = require("crypto");
 const tokenModel = require("../Models/token");
 const jwt = require("jsonwebtoken");
 const authorization = require("../middleware/aut");
-require("cookie-parser");
 
 //user signup
 route.post("/register", async (req, res) => {
@@ -52,6 +51,8 @@ route.post("/register", async (req, res) => {
 });
 // user loginn
 route.post("/login", async (req, res) => {
+  console.log("hi");
+  
   const { email, password } = req.body;
   try {
     const user = await userModel.findOne({ email });
@@ -97,13 +98,16 @@ route.post("/login", async (req, res) => {
       .status(200)
       .cookie("token", signedToken, {
         httpOnly: true,
-        sameSite: "strict",
+        sameSite: "none",
         secure: true,
         path: "/",
       })
-      .json({user :UserId});
+      .json({ user: UserId });
+    
+    console.log(res.getHeader());
+    
 
-      console.log('success');
+     
       
   } catch (err) {
     res.status(500).json({ msg: "server down" });
