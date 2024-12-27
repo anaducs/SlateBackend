@@ -99,19 +99,17 @@ route.post("/login", async (req, res) => {
       algorithm: "HS256",
       expiresIn: "7d",
     });
-    const UserId = user.id;   
-
-   
+    
     
     //sending cookie
     res
-      .status(200)
-      .cookie("token", signedToken, {
+        .cookie("token", signedToken, {
         httpOnly: true,
         sameSite: "none",
         secure: true,
         path: "/",
-      })
+        })
+      .status(200)
       .end();
     
         
@@ -167,8 +165,8 @@ route.post("/logout", async (req, res) => {
   res
     .clearCookie("token", {
       httpOnly: true,
-      sameSite: "Strict",
-      secure: false,
+      sameSite: "none",
+      secure: true,
       path: "/",
     })
     .status(200)
