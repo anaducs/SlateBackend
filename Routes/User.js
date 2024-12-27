@@ -102,15 +102,14 @@ route.post("/login", async (req, res) => {
     
     const userId = user.id;
     //sending cookie
-    res
-      .cookie("token", signedToken, {
+    res.cookie("token", signedToken, {
         httpOnly: true,
         sameSite: "none",
         secure: true,
         path: "/",
       })
       .status(200)
-      .json({ msg: "Login successful" });
+      .json({userId});
     
         
   } catch (err) {
