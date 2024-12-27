@@ -64,7 +64,7 @@ route.post("/login", async (req, res) => {
       
       
     }
-    console.log(user);
+    
     const isPasswordValid = await bcrypt.compare(password, user.hashedPassword);
     if (!isPasswordValid) {
      
