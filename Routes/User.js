@@ -100,17 +100,18 @@ route.post("/login", async (req, res) => {
       expiresIn: "7d",
     });
     
-    
+    const userId = user.id;
     //sending cookie
     res
-        .cookie("token", signedToken, {
+      .cookie("token", signedToken, {
         httpOnly: true,
         sameSite: "none",
         secure: true,
         path: "/",
-        })
+      });
+      console.log("Cookie set in response:", signedToken)
       .status(200)
-      .end();
+      .json({userId});
     
         
   } catch (err) {
