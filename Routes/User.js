@@ -108,8 +108,9 @@ route.post("/login", async (req, res) => {
         sameSite: "none",
         secure: true,
         path: "/",
-      }).status(200).json({ msg: "hi" });
-     
+      })
+      .status(200)
+      .json({ msg: "Login successful" });
     
         
   } catch (err) {
