@@ -108,13 +108,13 @@ route.post("/login", async (req, res) => {
         sameSite: "none",
         secure: true,
         path: "/",
-      });
-      console.log("Cookie set in response:", signedToken)
-      .status(200)
-      .json({userId});
+      }).status(200).json({ msg: "hi" });
+     
     
         
   } catch (err) {
+    console.log(err);
+    
     res.status(500).json({ msg: "server down" });
   }
 });
