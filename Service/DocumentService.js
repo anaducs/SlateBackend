@@ -12,7 +12,7 @@ const defaultValue = "";
 const initializeSocket = (server) => {
   io = socketIo(server, {
     cors: {
-      origin: "http://localhost:5173",
+      origin: "https://slate-u2yd.onrender.com",
       methods: ["GET", "POST"],
       allowedHeaders: ["Authorization"],
       credentials: true,
