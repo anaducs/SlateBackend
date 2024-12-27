@@ -58,7 +58,7 @@ route.post("/login", async (req, res) => {
     const user = await userModel.findOne({ email });
 
     if (!user) {
-      console.log("user not found");
+      
       return res.status(404).json({ msg: "invalid cridentials" });
       
       
@@ -67,13 +67,13 @@ route.post("/login", async (req, res) => {
     console.log(user);
     const isPasswordValid = await bcrypt.compare(password, user.hashedPassword);
     if (!isPasswordValid) {
-      console.log("password error")
+     
       return res.status(401).json({ msg: "invalid cridentials" });
       
     }
     if (!user.verified) {
       //generating token for email verification
-      console.log("user not verified");
+     
     const verifyToken = crypto.randomBytes(32).toString("hex");
 
     const token = await new tokenModel({
@@ -101,7 +101,7 @@ route.post("/login", async (req, res) => {
     });
     const UserId = user.id;   
 
-    console.log(UserId);
+   
     
     //sending cookie
     res
@@ -112,7 +112,7 @@ route.post("/login", async (req, res) => {
         secure: true,
         path: "/",
       })
-      .json({ user: UserId });
+      .end();
     
         
   } catch (err) {
@@ -144,6 +144,8 @@ route.get("/:id/:token", async (req, res) => {
 //dashboard
 route.get("/dashboard", authorization, async (req, res) => {
   const user = req.user;
+  console.log("from dashboard",user);
+  
   res.status(200).json({user});
 });
 
