@@ -104,11 +104,7 @@ route.post("/login", async (req, res) => {
       })
       .json({ user: UserId });
     
-    console.log(res.getHeader());
-    
-
-     
-      
+        
   } catch (err) {
     res.status(500).json({ msg: "server down" });
   }
